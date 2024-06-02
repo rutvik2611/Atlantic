@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  traefik:
+    image: traefik:latest
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+    ports:
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - backboneNetwork
+    labels:
+      traefik.http.routers.api.rule: "Host(`traefik.${MAIN_DOMAIN}`) && PathPrefix(`/dashboard`)"
+      traefik.http.routers.api.entryPoints: http
+      traefik.http.routers.api.service: api@internal
+      traefik.enable: true
+
+networks:
+  backboneNetwork:
+    external: true

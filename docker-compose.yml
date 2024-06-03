@@ -53,7 +53,29 @@ services:
     networks:
       - backboneNetwork
 
+  openvpn:
+    cap_add:
+      - NET_ADMIN
+    image: "kylemanna/openvpn"
+    container_name: "openvpn"
+    volumes:
+      - "./OPENVPN-Server/openvpn:/etc/openvpn"
+    restart: always
+    networks:
+      - backboneNetwork
+    environment:
+      - MAIN_DOMAIN=${MAIN_DOMAIN}
+    command: bash -c "echo -e 'yes\n\n' | ovpn_initpki && ovpn_genconfig -u udp://${MAIN_DOMAIN} && echo -e '\n\n\n\n\n\n\n' | ovpn_initpki"
 
+  openvpn-proxy:
+    image: "containous/whoami"
+    container_name: "openvpn-proxy"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.openvpn-proxy.rule=HostSNI(`*`)"
+      - "traefik.tcp.services.openvpn-proxy.loadbalancer.server.port=1194"
+    networks:
+      - backboneNetwork
 networks:
   backboneNetwork:
     external: true

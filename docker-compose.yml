@@ -1,22 +1,43 @@
-version: '3.8'
+version: "3.3"
 
 services:
+
   traefik:
-    image: traefik:latest
+    image: "traefik:v3.0"
+    container_name: "traefik"
     command:
+      - "--log.level=DEBUG"
       - "--api.insecure=true"
       - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entryPoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+#      - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.myresolver.acme.email=rutvik2611@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
+      - "80:80"
+      - "443:443"
       - "8080:8080"
     volumes:
+      - "./letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
       - backboneNetwork
+
+  whoami:
+    image: "traefik/whoami"
+    container_name: "simple-service"
     labels:
-      traefik.http.routers.api.rule: "Host(`traefik.${MAIN_DOMAIN}`) && PathPrefix(`/dashboard`)"
-      traefik.http.routers.api.entryPoints: http
-      traefik.http.routers.api.service: api@internal
-      traefik.enable: true
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.entrypoints=web"
+      - "traefik.http.routers.whoami.tls.certresolver=myresolver"
+    networks:
+        - backboneNetwork
 
 networks:
   backboneNetwork:

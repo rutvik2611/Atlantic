@@ -76,8 +76,12 @@ To perform maintenance tasks, follow these steps:
 
     ```bash
     docker-compose down
-    docker-compose up -d
+    docker-compose up
     ```
+   ```bash
+    docker-compose logs -f
+    ```
+
 
 # Contributing
 

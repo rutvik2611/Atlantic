@@ -20,7 +20,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "9000:9000"  # Expose Portainer on port 9000
       - "8080:8080"
     volumes:
       - "./letsencrypt:/letsencrypt"
@@ -44,10 +43,10 @@ services:
     container_name: "portainer"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./persist/portainer/data:/data"  # Mount volume for Portainer data persistence
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.portainer.rule=Host(`portainer.${MAIN_DOMAIN}`)"
-      - "traefik.http.services.portainer.loadbalancer.server.port=9000"  # Use port 9000 for Portainer
       - "traefik.http.routers.portainer.entrypoints=websecure"  # Define the entry point
       - "traefik.http.routers.portainer.tls.certresolver=myresolver"  # Define the TLS resolver
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"  # Define the Portainer service port

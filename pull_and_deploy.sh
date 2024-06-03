@@ -56,6 +56,7 @@ ssh ${DROPLET_USER}@${DROPLET_IP} << EOF
         exit 1
     else
         echo "New container deployed successfully."
+        docker ps
     fi
 EOF
 

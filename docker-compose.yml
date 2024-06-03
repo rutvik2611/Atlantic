@@ -14,12 +14,13 @@ services:
       - "--entryPoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
       - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
-#      - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       - "--certificatesresolvers.myresolver.acme.email=rutvik2611@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
       - "443:443"
+      - "9000:9000"  # Expose Portainer on port 9000
       - "8080:8080"
     volumes:
       - "./letsencrypt:/letsencrypt"
@@ -34,10 +35,25 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.whoami.rule=Host(`whoami.${MAIN_DOMAIN}`)"
       - "traefik.http.routers.whoami.entrypoints=websecure"
-      - "traefik.http.routers.whoami.entrypoints=web"
       - "traefik.http.routers.whoami.tls.certresolver=myresolver"
     networks:
         - backboneNetwork
+
+  portainer:
+    image: "portainer/portainer"
+    container_name: "portainer"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.${MAIN_DOMAIN}`)"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"  # Use port 9000 for Portainer
+      - "traefik.http.routers.portainer.entrypoints=websecure"  # Define the entry point
+      - "traefik.http.routers.portainer.tls.certresolver=myresolver"  # Define the TLS resolver
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"  # Define the Portainer service port
+    networks:
+      - backboneNetwork
+
 
 networks:
   backboneNetwork:

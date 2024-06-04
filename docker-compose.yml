@@ -22,7 +22,7 @@ services:
       - "443:443"
       - "8080:8080"
     volumes:
-      - "./letsencrypt:/letsencrypt"
+      - "./persist/letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
       - backboneNetwork
@@ -52,78 +52,87 @@ services:
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"  # Define the Portainer service port
     networks:
       - backboneNetwork
-#  openvpn:
-#      cap_add:
-#        - NET_ADMIN
-#      image: "kylemanna/openvpn"
-#      container_name: "openvpn"
-#      volumes:
-#        - ./openvpn:/etc/openvpn
-#        - ./init_openvpn.sh:/init_openvpn.sh:rw # Mount the script file
-#      restart: always
-#      networks:
-#        - backboneNetwork
-#      environment:
-#        - MAIN_DOMAIN=${MAIN_DOMAIN}
-#        - EASYRSA_BATCH=1
-#        - EASYRSA_REQ_CN=OpenVPN-CA
-#        - EASYRSA_CA_EXPIRE=3650
-#        - EASYRSA_CERT_EXPIRE=3650
-#        - EASYRSA_KEY_SIZE=2048
-#        - EASYRSA_PKI=/etc/openvpn/pki
-#        - EASYRSA_PASSIN=pass:LONGPASSWORD
-#        - EASYRSA_PASSOUT=pass:LONGPASSWORD
-#      command:
-#        - sh
-#        - -c
-#        - |
-#          chmod +x /init_openvpn.sh
-#          /init_openvpn.sh
-#          exec ovpn_run
-#      user: root
-  openvpn:
-    cap_add:
-      - NET_ADMIN
-    image: "kylemanna/openvpn"
-    container_name: "openvpn"
-    volumes:
-      - ./openvpn:/etc/openvpn
-      - ./init_openvpn.sh:/init_openvpn.sh:rw # Mount the script file
-    restart: always
-    networks:
-      - backboneNetwork
+
+  clip-sync:
+    image: temp12611/clipsync:latest
+    container_name: "clip-sync"
+    ports:
+      - "5001:5001"
+    env_file:
+      - .env
     environment:
-      - MAIN_DOMAIN=${MAIN_DOMAIN}
-      - EASYRSA_BATCH=1
-      - EASYRSA_REQ_CN=OpenVPN-CA
-      - EASYRSA_CA_EXPIRE=3650
-      - EASYRSA_CERT_EXPIRE=3650
-      - EASYRSA_KEY_SIZE=2048
-      - EASYRSA_PKI=/etc/openvpn/pki
-      - EASYRSA_PASSIN=pass:LONGPASSWORD
-      - EASYRSA_PASSOUT=pass:LONGPASSWORD
-    command: >
-      sh -c '
-        ovpn_genconfig -u udp://vpn.${MAIN_DOMAIN} &&
-        ovpn_initpki nopass &&
-        easyrsa build-client-full r2611 nopass &&
-        ovpn_getclient r2611 > /etc/openvpn/r2611.ovpn &&
-        ovpn_run
-      '
-    user: root
-
-
-
-
-  openvpn-proxy:
-    image: "containous/whoami"
-    container_name: "openvpn-proxy"
+      AWS_REGION: ${AWS_REGION:-}
+      AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID:-}
+      url: ${url}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      pass: ${pass}
     labels:
       - "traefik.enable=true"
-      - "traefik.tcp.routers.openvpn-proxy.rule=HostSNI(`*`)"
-      - "traefik.tcp.services.openvpn-proxy.loadbalancer.server.port=1194"
+      - "traefik.http.routers.clipsync.rule=Host(`clipsync.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.clipsync.entrypoints=websecure"
+      - "traefik.http.routers.clipsync.tls.certresolver=myresolver"
+      - "traefik.http.services.clipsync.loadbalancer.server.port=5001"
     networks:
       - backboneNetwork
+
+#  openvpn:
+#    cap_add:
+#      - NET_ADMIN
+#    image: "kylemanna/openvpn"
+#    container_name: "openvpn"
+#    ports:
+#      - "1194:1194/udp"
+#    volumes:
+#      - ./openvpn:/etc/openvpn
+#      - ./init_openvpn.sh:/init_openvpn.sh:rw # Mount the script file
+#    restart: always
+#    networks:
+#      - backboneNetwork
+#    environment:
+#      - MAIN_DOMAIN=${MAIN_DOMAIN}
+#      - EASYRSA_BATCH=1
+#      - EASYRSA_REQ_CN=OpenVPN-CA
+#      - EASYRSA_CA_EXPIRE=3650
+#      - EASYRSA_CERT_EXPIRE=3650
+#      - EASYRSA_KEY_SIZE=2048
+#      - EASYRSA_PKI=/etc/openvpn/pki
+#      - EASYRSA_PASSIN=pass:LONGPASSWORD
+#      - EASYRSA_PASSOUT=pass:LONGPASSWORD
+#    command: >
+#      sh -c '
+#        ovpn_genconfig -u udp://vpn.${MAIN_DOMAIN} &&
+#        ovpn_initpki nopass &&
+#        easyrsa build-client-full r26114 nopass &&
+#        ovpn_getclient r26114 > /etc/openvpn/r26114.ovpn &&
+#        ovpn_run
+#      '
+#    user: root
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.udp.routers.openvpn.rule=Host(`vpn.${MAIN_DOMAIN}`)"
+#      - "traefik.udp.routers.openvpn.entrypoints=udp"
+#      - "traefik.udp.services.openvpn.loadbalancer.server.port=1194"
+
+#  openvpn-as:
+#    image: openvpn/openvpn-as
+#    container_name: openvpn-as
+#    cap_add:
+#      - NET_ADMIN
+#    ports:
+#      - "943:943"
+##      - "443:443"
+#      - "1194:1194/udp"
+#    volumes:
+#      - ./persist/openvpn:/openvpn
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.openvpn.rule=Host(`openvpn.${MAIN_DOMAIN}`)"
+#      - "traefik.http.routers.openvpn.entrypoints=websecure"
+#      - "traefik.http.routers.openvpn.tls.certresolver=myresolver"
+#      - "traefik.http.services.openvpn.loadbalancer.server.port=443"
+#
+#    networks:
+#      - backboneNetwork
 
 networks:
   backboneNetwork:

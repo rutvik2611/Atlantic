@@ -52,20 +52,68 @@ services:
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"  # Define the Portainer service port
     networks:
       - backboneNetwork
-
+#  openvpn:
+#      cap_add:
+#        - NET_ADMIN
+#      image: "kylemanna/openvpn"
+#      container_name: "openvpn"
+#      volumes:
+#        - ./openvpn:/etc/openvpn
+#        - ./init_openvpn.sh:/init_openvpn.sh:rw # Mount the script file
+#      restart: always
+#      networks:
+#        - backboneNetwork
+#      environment:
+#        - MAIN_DOMAIN=${MAIN_DOMAIN}
+#        - EASYRSA_BATCH=1
+#        - EASYRSA_REQ_CN=OpenVPN-CA
+#        - EASYRSA_CA_EXPIRE=3650
+#        - EASYRSA_CERT_EXPIRE=3650
+#        - EASYRSA_KEY_SIZE=2048
+#        - EASYRSA_PKI=/etc/openvpn/pki
+#        - EASYRSA_PASSIN=pass:LONGPASSWORD
+#        - EASYRSA_PASSOUT=pass:LONGPASSWORD
+#      command:
+#        - sh
+#        - -c
+#        - |
+#          chmod +x /init_openvpn.sh
+#          /init_openvpn.sh
+#          exec ovpn_run
+#      user: root
   openvpn:
     cap_add:
       - NET_ADMIN
     image: "kylemanna/openvpn"
     container_name: "openvpn"
     volumes:
-      - "./OPENVPN-Server/openvpn:/etc/openvpn"
+      - ./openvpn:/etc/openvpn
+      - ./init_openvpn.sh:/init_openvpn.sh:rw # Mount the script file
     restart: always
     networks:
       - backboneNetwork
     environment:
       - MAIN_DOMAIN=${MAIN_DOMAIN}
-    command: bash -c "echo -e 'yes\n\n' | ovpn_initpki && ovpn_genconfig -u udp://${MAIN_DOMAIN} && echo -e '\n\n\n\n\n\n\n' | ovpn_initpki"
+      - EASYRSA_BATCH=1
+      - EASYRSA_REQ_CN=OpenVPN-CA
+      - EASYRSA_CA_EXPIRE=3650
+      - EASYRSA_CERT_EXPIRE=3650
+      - EASYRSA_KEY_SIZE=2048
+      - EASYRSA_PKI=/etc/openvpn/pki
+      - EASYRSA_PASSIN=pass:LONGPASSWORD
+      - EASYRSA_PASSOUT=pass:LONGPASSWORD
+    command: >
+      sh -c '
+        ovpn_genconfig -u udp://vpn.${MAIN_DOMAIN} &&
+        ovpn_initpki nopass &&
+        easyrsa build-client-full r2611 nopass &&
+        ovpn_getclient r2611 > /etc/openvpn/r2611.ovpn &&
+        ovpn_run
+      '
+    user: root
+
+
+
 
   openvpn-proxy:
     image: "containous/whoami"
@@ -76,6 +124,7 @@ services:
       - "traefik.tcp.services.openvpn-proxy.loadbalancer.server.port=1194"
     networks:
       - backboneNetwork
+
 networks:
   backboneNetwork:
     external: true

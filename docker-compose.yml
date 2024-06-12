@@ -2,9 +2,11 @@ version: "3.3"
 
 services:
 
+
   traefik:
     image: "traefik:v3.0"
     container_name: "traefik"
+    restart: always
     command:
       - "--log.level=DEBUG"
       - "--api.insecure=true"
@@ -16,7 +18,10 @@ services:
       - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       - "--certificatesresolvers.myresolver.acme.email=rutvik2611@gmail.com"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      # Enable HTTP to HTTPS redirection middleware
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entryPoint.permanent=true"
     ports:
       - "80:80"
       - "443:443"
@@ -27,20 +32,40 @@ services:
     networks:
       - backboneNetwork
 
-  whoami:
-    image: "traefik/whoami"
-    container_name: "simple-service"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.whoami.rule=Host(`whoami.${MAIN_DOMAIN}`)"
-      - "traefik.http.routers.whoami.entrypoints=websecure"
-      - "traefik.http.routers.whoami.tls.certresolver=myresolver"
-    networks:
-        - backboneNetwork
+## Not Working
+#  traefik:
+#    image: "traefik:v3.0"
+#    container_name: "traefik"
+#    command:
+#      - "--configFile=/etc/traefik/traefik.yml"  # Specify the location of traefik.yml
+#    restart: always
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#      - "8080:8080"
+#    volumes:
+#      - "./traefik.yml:/etc/traefik/traefik.yml"  # Mount the traefik.yml file into the container
+#      - "./persist/letsencrypt:/letsencrypt"
+#      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+#    networks:
+#      - backboneNetwork
+
+#  whoami:
+#    image: "traefik/whoami"
+#    container_name: "simple-service"
+#    restart: always
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.whoami.rule=Host(`whoami.${MAIN_DOMAIN}`)"
+#      - "traefik.http.routers.whoami.entrypoints=websecure"
+#      - "traefik.http.routers.whoami.tls.certresolver=myresolver"
+#    networks:
+#        - backboneNetwork
 
   portainer:
     image: "portainer/portainer"
     container_name: "portainer"
+    restart: always
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "./persist/portainer/data:/data"  # Mount volume for Portainer data persistence
@@ -56,10 +81,11 @@ services:
   clip-sync:
     image: temp12611/clipsync:latest
     container_name: "clip-sync"
-    ports:
-      - "5001:5001"
+#    ports:
+#      - "5001:5001"
     env_file:
       - .env
+    restart: always
     environment:
       AWS_REGION: ${AWS_REGION:-}
       AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID:-}
@@ -68,71 +94,57 @@ services:
       pass: ${pass}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.clipsync.rule=Host(`clipsync.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.clipsync.rule=Host(`magicsync.${MAIN_DOMAIN}`)"
       - "traefik.http.routers.clipsync.entrypoints=websecure"
       - "traefik.http.routers.clipsync.tls.certresolver=myresolver"
       - "traefik.http.services.clipsync.loadbalancer.server.port=5001"
     networks:
       - backboneNetwork
 
-#  openvpn:
-#    cap_add:
-#      - NET_ADMIN
-#    image: "kylemanna/openvpn"
-#    container_name: "openvpn"
-#    ports:
-#      - "1194:1194/udp"
-#    volumes:
-#      - ./openvpn:/etc/openvpn
-#      - ./init_openvpn.sh:/init_openvpn.sh:rw # Mount the script file
-#    restart: always
-#    networks:
-#      - backboneNetwork
-#    environment:
-#      - MAIN_DOMAIN=${MAIN_DOMAIN}
-#      - EASYRSA_BATCH=1
-#      - EASYRSA_REQ_CN=OpenVPN-CA
-#      - EASYRSA_CA_EXPIRE=3650
-#      - EASYRSA_CERT_EXPIRE=3650
-#      - EASYRSA_KEY_SIZE=2048
-#      - EASYRSA_PKI=/etc/openvpn/pki
-#      - EASYRSA_PASSIN=pass:LONGPASSWORD
-#      - EASYRSA_PASSOUT=pass:LONGPASSWORD
-#    command: >
-#      sh -c '
-#        ovpn_genconfig -u udp://vpn.${MAIN_DOMAIN} &&
-#        ovpn_initpki nopass &&
-#        easyrsa build-client-full r26114 nopass &&
-#        ovpn_getclient r26114 > /etc/openvpn/r26114.ovpn &&
-#        ovpn_run
-#      '
-#    user: root
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.udp.routers.openvpn.rule=Host(`vpn.${MAIN_DOMAIN}`)"
-#      - "traefik.udp.routers.openvpn.entrypoints=udp"
-#      - "traefik.udp.services.openvpn.loadbalancer.server.port=1194"
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./persist/prowlarr:/config
+    ports:
+      - "9696:9696"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.prowlarr.entrypoints=websecure"
+      - "traefik.http.routers.prowlarr.tls.certresolver=myresolver"
+      - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
+    networks:
+      - backboneNetwork
 
-#  openvpn-as:
-#    image: openvpn/openvpn-as
-#    container_name: openvpn-as
-#    cap_add:
-#      - NET_ADMIN
-#    ports:
-#      - "943:943"
-##      - "443:443"
-#      - "1194:1194/udp"
-#    volumes:
-#      - ./persist/openvpn:/openvpn
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.http.routers.openvpn.rule=Host(`openvpn.${MAIN_DOMAIN}`)"
-#      - "traefik.http.routers.openvpn.entrypoints=websecure"
-#      - "traefik.http.routers.openvpn.tls.certresolver=myresolver"
-#      - "traefik.http.services.openvpn.loadbalancer.server.port=443"
-#
-#    networks:
-#      - backboneNetwork
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - "./persist/radarr/config:/radarr/config"
+      - "./persist/radarr/movies:/radarr/movies"
+      - "./persist/raddar/downloads:/radarr/downloads"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.radarr.rule=Host(`radarr.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.radarr.entrypoints=websecure"
+      - "traefik.http.routers.radarr.tls.certresolver=myresolver"
+      - "traefik.http.services.radarr.loadbalancer.server.port=7878"
+    networks:
+      - backboneNetwork
+
+
 
 networks:
   backboneNetwork:

@@ -6,6 +6,7 @@ WORKDIR /app
 
 # Copy .env and docker-compose.yml into the container's /app directory
 COPY .env .
+COPY traefik.yml .
 COPY docker-compose.yml .
 
 # Entry point to run docker-compose up when the container starts

@@ -1,0 +1,120 @@
+version: "3.3"
+
+services:
+
+
+  portainer:
+    image: "portainer/portainer:latest"
+    container_name: "portainer"
+    restart: always
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./persist/portainer/data:/data"  # Mount volume for Portainer data persistence
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.portainer.entrypoints=websecure"  # Define the entry point
+      - "traefik.http.routers.portainer.tls.certresolver=myresolver"  # Define the TLS resolver
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"  # Define the Portainer service port
+    networks:
+      - backboneNetwork
+
+  clip-sync:
+    image: temp12611/clipsync:latest
+    container_name: "clip-sync"
+#    ports:
+#      - "5001:5001"
+    env_file:
+      - ../.env
+    restart: always
+    environment:
+      AWS_REGION: ${AWS_REGION:-}
+      AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID:-}
+      url: ${url}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      pass: ${pass}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.clipsync.rule=Host(`magicsync.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.clipsync.entrypoints=websecure"
+      - "traefik.http.routers.clipsync.tls.certresolver=myresolver"
+      - "traefik.http.services.clipsync.loadbalancer.server.port=5001"
+    networks:
+      - backboneNetwork
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./persist/prowlarr:/config
+    ports:
+      - "9696:9696"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.prowlarr.entrypoints=websecure"
+      - "traefik.http.routers.prowlarr.tls.certresolver=myresolver"
+      - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
+    networks:
+      - backboneNetwork
+
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - "./persist/radarr/config:/radarr/config"
+      - "./persist/radarr/movies:/radarr/movies"
+      - "./persist/raddar/downloads:/radarr/downloads"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.radarr.rule=Host(`radarr.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.radarr.entrypoints=websecure"
+      - "traefik.http.routers.radarr.tls.certresolver=myresolver"
+      - "traefik.http.services.radarr.loadbalancer.server.port=7878"
+    networks:
+      - backboneNetwork
+
+#  qbittorrent:
+#    image: lscr.io/linuxserver/qbittorrent:latest
+#    container_name: qbittorrent
+#    environment:
+#      - PUID=1000
+#      - PGID=1000
+#      - TZ=America/New_York
+#      - WEBUI_PORT=8080
+#    volumes:
+#      - "./persist/qbittorrent/config:/config"
+#      - "./persist/qbittorrent/downloads:/downloads"
+#    restart: unless-stopped
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.qbittorrent-http.rule=Host(`qbittorrent.${MAIN_DOMAIN}`)"
+#      - "traefik.http.routers.qbittorrent-http.entrypoints=web"
+#      - "traefik.http.services.qbittorrent-http.loadbalancer.server.port=8080"
+#      - "traefik.http.routers.qbittorrent-https.rule=Host(`qbittorrent.${MAIN_DOMAIN}`)"
+#      - "traefik.http.routers.qbittorrent-https.entrypoints=websecure"
+#      - "traefik.http.routers.qbittorrent-https.tls.certresolver=myresolver"
+#      - "traefik.http.services.qbittorrent-https.loadbalancer.server.port=8080"
+#    networks:
+#      - backboneNetwork
+
+
+
+
+
+
+
+networks:
+  backboneNetwork:
+    external: true

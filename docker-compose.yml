@@ -16,12 +16,15 @@ services:
       - "--entryPoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
       - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      # uat
+      - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      # Prod
       - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       - "--certificatesresolvers.myresolver.acme.email=rutvik2611@gmail.com"
       # Enable HTTP to HTTPS redirection middleware
-      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
-      - "--entrypoints.web.http.redirections.entryPoint.permanent=true"
+#      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+#      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+#      - "--entrypoints.web.http.redirections.entryPoint.permanent=true"
     ports:
       - "80:80"
       - "443:443"
@@ -63,7 +66,7 @@ services:
 #        - backboneNetwork
 
   portainer:
-    image: "portainer/portainer"
+    image: "portainer/portainer:latest"
     container_name: "portainer"
     restart: always
     volumes:
@@ -143,6 +146,38 @@ services:
       - "traefik.http.services.radarr.loadbalancer.server.port=7878"
     networks:
       - backboneNetwork
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - WEBUI_PORT=8080
+    volumes:
+      - "./persist/qbittorrent/config:/config"
+      - "./persist/qbittorrent/downloads:/downloads"
+    restart: unless-stopped
+    labels:
+      # HTTP configuration
+      - "traefik.enable=true"
+      - "traefik.http.routers.qbittorrent-http.rule=Host(`qbittorrent.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.qbittorrent-http.entrypoints=web"
+      - "traefik.http.services.qbittorrent-http.loadbalancer.server.port=8080"
+
+      # HTTPS configuration
+      - "traefik.http.routers.qbittorrent-https.rule=Host(`qbittorrent.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.qbittorrent-https.entrypoints=websecure"
+      - "traefik.http.routers.qbittorrent-https.tls.certresolver=myresolver"
+      - "traefik.http.services.qbittorrent-https.loadbalancer.server.port=8080"
+
+    networks:
+      - backboneNetwork
+
+
+
+
 
 
 

@@ -1,0 +1,50 @@
+# traefik.yml
+
+# Set logging level to DEBUG
+log:
+  level: DEBUG
+
+# Enable insecure API for testing purposes
+api:
+  insecure: true
+
+# Define entry points for HTTP and HTTPS
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+# Configure Docker provider settings
+providers:
+  docker:
+    exposedByDefault: false
+
+# Configure Let's Encrypt certificate resolver
+certificatesResolvers:
+  myresolver:
+    acme:
+      # Enable HTTP challenge for certificate issuance
+      httpChallenge:
+        entryPoint: web
+      # Define Let's Encrypt CA server URL (staging for testing)
+      caserver: https://acme-staging-v02.api.letsencrypt.org/directory
+      # Set email for Let's Encrypt notifications
+      email: rutvik2611@gmail.com
+      # Specify storage path for certificates
+      storage: /letsencrypt/acme.json
+
+# Define HTTP to HTTPS redirection middleware
+http:
+  routers:
+    http-to-https:
+      rule: "HostRegexp(`{any:.+}`)"
+      service: noop
+      middlewares:
+        - redirect-to-https
+
+  middlewares:
+    redirect-to-https:
+      redirectScheme:
+        scheme: https
+        permanent: true

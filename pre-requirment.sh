@@ -60,7 +60,7 @@ check_status "Adding user to docker group"
 
 # Install additional useful packages
 echo "Installing additional useful packages..."
-sudo apt-get install -y git vim ufw
+sudo apt-get install -y git vim ufw zip
 check_status "Installing additional packages"
 
 # Setup UFW (Uncomplicated Firewall)

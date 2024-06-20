@@ -1,0 +1,30 @@
+# Use a base image that includes bash, zip, python3, and necessary dependencies
+FROM alpine:latest
+
+# Install bash, zip, python3, and pip
+RUN apk update && apk add --no-cache bash zip python3 py3-pip
+
+# Install Docker Compose dependencies
+RUN apk add --no-cache curl
+
+# Check the architecture and download Docker Compose binary accordingly
+RUN if [ $(uname -m) = "x86_64" ]; then \
+        curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose; \
+    else \
+        echo "Unsupported architecture"; exit 1; \
+    fi \
+    && chmod +x /usr/local/bin/docker-compose
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy .env, traefik.yml, docker-compose.yml, and any other necessary files into the container's /app directory
+COPY .env .
+COPY traefik.yml .
+COPY docker-compose.yml .
+
+# Uncomment and adjust if 'development' directory is needed
+# COPY development .
+
+# Entry point to run docker-compose up when the container starts
+ENTRYPOINT ["docker-compose", "up"]

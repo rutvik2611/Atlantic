@@ -35,7 +35,7 @@ fi
 echo "Files from '${LOCAL_DIR}' copied successfully to '${DROPLET_IP}:${REMOTE_DIR}' on the remote server."
 
 # SSH command to stop and remove existing Docker Compose containers
-ssh "${DROPLET_USER}@${DROPLET_IP}" "docker-compose -f ${REMOTE_DIR}/${DOCKER_COMPOSE_FILE} down"
+ssh "${DROPLET_USER}@${DROPLET_IP}" "export MAIN_DOMAIN= && export url= && export pass= && docker-compose -f ${REMOTE_DIR}/${DOCKER_COMPOSE_FILE} down"
 
 # Check if docker-compose down command succeeded
 if [ $? -ne 0 ]; then
@@ -43,8 +43,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# SSH command to set MAIN_DOMAIN environment variable and bring up test-docker-compose.yml on remote server
-ssh "${DROPLET_USER}@${DROPLET_IP}" "export MAIN_DOMAIN=rutvik2611.com && docker-compose -f ${REMOTE_DIR}/${DOCKER_COMPOSE_FILE} up -d"
+# SSH command to set MAIN_DOMAIN environment variable and bring up prod-docker-compose.yml on remote server
+ssh "${DROPLET_USER}@${DROPLET_IP}" "export MAIN_DOMAIN= && export url= && export pass= && docker-compose -f ${REMOTE_DIR}/${DOCKER_COMPOSE_FILE} up -d"
 
 # Check if docker-compose up command succeeded
 if [ $? -ne 0 ]; then

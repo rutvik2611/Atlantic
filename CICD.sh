@@ -14,6 +14,6 @@ if [ $? -eq 0 ]; then
     # Run the second shell script if the first one succeeded
     ./pull_and_deploy.sh
 else
-    echo "Error: First script failed. Exiting without running the second script."
+    echo "Error: First script failed. Exiting without running the second script. "
     exit 1
 fi

@@ -15,10 +15,10 @@ services:
       # HTTPS router
       - "traefik.http.routers.vscode-secure.rule=Host(`vscode.${MAIN_DOMAIN}`)"
       - "traefik.http.routers.vscode-secure.entrypoints=websecure"
-      - "traefik.http.routers.vscode-secure.tls=true"
+      - "traefik.http.routers.vscode-secure.tls.certresolver=myresolver"
       - "traefik.http.services.vscode-secure.loadbalancer.server.port=8080"
       # Middleware for redirecting HTTP to HTTPS
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+#      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
     user: "root"
     networks:
       - backboneNetwork

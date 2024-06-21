@@ -99,13 +99,10 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.qbittorrent-http.rule=Host(`qbittorrent.${MAIN_DOMAIN}`)"
-      - "traefik.http.routers.qbittorrent-http.entrypoints=web"
-      - "traefik.http.services.qbittorrent-http.loadbalancer.server.port=8080"
-      - "traefik.http.routers.qbittorrent-https.rule=Host(`qbittorrent.${MAIN_DOMAIN}`)"
-      - "traefik.http.routers.qbittorrent-https.entrypoints=websecure"
-      - "traefik.http.routers.qbittorrent-https.tls.certresolver=myresolver"
-      - "traefik.http.services.qbittorrent-https.loadbalancer.server.port=8080"
+      - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.qbittorrent.entrypoints=websecure"
+      - "traefik.http.routers.qbittorrent.tls.certresolver=myresolver"
+      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
     networks:
       - backboneNetwork
 

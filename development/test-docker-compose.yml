@@ -1,27 +1,27 @@
 version: "3.3"
 
 services:
-#  vscode:
-#    image: codercom/code-server
-#    container_name: vscode-server
-#    restart: always
-#    environment:
-#      - PASSWORD=password  # Replace with your desired password
-#    volumes:
-#      - "./persist/code:/home/coder/project"
-#      - "/var/run/docker.sock:/var/run/docker.sock"
-#    labels:
-#      - "traefik.enable=true"
-#      # HTTPS router
-#      - "traefik.http.routers.vscode-secure.rule=Host(`vscode.${MAIN_DOMAIN}`)"
-#      - "traefik.http.routers.vscode-secure.entrypoints=websecure"
-#      - "traefik.http.routers.vscode-secure.tls.certresolver=myresolver"
-#      - "traefik.http.services.vscode-secure.loadbalancer.server.port=8080"
-#      # Middleware for redirecting HTTP to HTTPS
-##      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-#    user: "root"
-#    networks:
-#      - backboneNetwork
+  vscode:
+    image: codercom/code-server
+    container_name: vscode-server
+    restart: always
+    environment:
+      - PASSWORD=password  # Replace with your desired password
+    volumes:
+      - "./persist/code:/home/coder/project"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      - "traefik.enable=true"
+      # HTTPS router
+      - "traefik.http.routers.vscode-secure.rule=Host(`vscode.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.vscode-secure.entrypoints=websecure"
+      - "traefik.http.routers.vscode-secure.tls.certresolver=myresolver"
+      - "traefik.http.services.vscode-secure.loadbalancer.server.port=8080"
+      # Middleware for redirecting HTTP to HTTPS
+#      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+    user: "root"
+    networks:
+      - backboneNetwork
 
 
 networks:

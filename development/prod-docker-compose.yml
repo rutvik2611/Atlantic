@@ -136,6 +136,27 @@ services:
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
     networks:
       - backboneNetwork
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    restart: always
+    environment:
+      - PUID=1000  # Replace with your user ID
+      - PGID=1000  # Replace with your group ID
+      - TZ=Etc/UTC  # Replace with your timezone
+    volumes:
+      - "./persist/jellyfin/config:/config"
+      - "./persist/jellyfin/cache:/cache"
+      - "./persist/qbittorrent/downloads:/media"
+    labels:
+      - "traefik.enable=true"
+      # HTTPS router
+      - "traefik.http.routers.jellyfin-secure.rule=Host(`jellyfin.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.jellyfin-secure.entrypoints=websecure"
+      - "traefik.http.routers.jellyfin-secure.tls.certresolver=myresolver"
+      - "traefik.http.services.jellyfin-secure.loadbalancer.server.port=8096"
+    networks:
+      - backboneNetwork
 
 
 

@@ -26,6 +26,50 @@ services:
     networks:
       - backboneNetwork
 
+  postgres-db:
+    image: postgres:13
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: guacamole_db
+    volumes:
+      - /app/development/persist/postgres/db:/var/lib/postgresql/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.postgres.rule=HostSNI(`postgres.${MAIN_DOMAIN}`)"
+      - "traefik.tcp.routers.postgres.entrypoints=websecure"
+      - "traefik.tcp.routers.postgres.tls.certresolver=myresolver"
+      - "traefik.tcp.services.postgres.loadbalancer.server.port=5432"
+    networks:
+      - backboneNetwork
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8081:80"
+    volumes:
+      - /app/development/persist/pgadmin:/var/lib/pgadmin
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.pgadmin.entrypoints=websecure"
+      - "traefik.http.routers.pgadmin.tls.certresolver=myresolver"
+      - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
+      # Middleware for redirecting HTTP to HTTPS
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.pgadmin-secure.rule=Host(`pgadmin.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.pgadmin-secure.entrypoints=web"
+      - "traefik.http.routers.pgadmin-secure.middlewares=redirect-to-https"
+    networks:
+      - backboneNetwork
+
 networks:
   backboneNetwork:
     external: true

@@ -82,8 +82,8 @@ services:
       - TZ=America/New_York
     volumes:
       - ./persist/prowlarr:/config
-    ports:
-      - "9696:9696"
+#    ports:
+#      - "9696:9696"
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -158,6 +158,55 @@ services:
     networks:
       - backboneNetwork
 
+#
+#  guacamole:
+#    image: abesnier/guacamole
+#    container_name: guacamole
+#    restart: always
+#    environment:
+#      - MYSQL_HOSTNAME=guac-db
+#      - MYSQL_PORT=3306
+#      - MYSQL_DATABASE=guacamole_db
+#      - MYSQL_USER=admin
+#      - MYSQL_PASSWORD=admin
+#      - GUACD_HOSTNAME=guacd
+#    volumes:
+#      - "/app/development/persist/guacamole/config:/config:rw"
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.guacamole.rule=Host(`guacamole.${MAIN_DOMAIN}`)"
+#      - "traefik.http.routers.guacamole.entrypoints=websecure"
+#      - "traefik.http.routers.guacamole.tls.certresolver=myresolver"
+#      - "traefik.http.services.guacamole.loadbalancer.server.port=8080"
+#      # Middleware for redirecting HTTP to HTTPS
+#      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+#      - "traefik.http.routers.guacamole-secure.rule=Host(`guacamole.${MAIN_DOMAIN}`)"
+#      - "traefik.http.routers.guacamole-secure.entrypoints=web"
+#      - "traefik.http.routers.guacamole-secure.middlewares=redirect-to-https"
+#    networks:
+#      - backboneNetwork
+#
+#  guac-db:
+#    image: mysql:5.7
+#    container_name: guac-db
+#    restart: always
+#    environment:
+#      MYSQL_ROOT_PASSWORD: admin
+#      MYSQL_DATABASE: guacamole_db
+#      MYSQL_USER: admin
+#      MYSQL_PASSWORD: admin
+#    volumes:
+#      - /app/development/persist/guacamole/db:/var/lib/mysql
+#    networks:
+#      - backboneNetwork
+#
+#  guacd:
+#    image: guacamole/guacd
+#    container_name: guacd
+#    restart: always
+#    networks:
+#      - backboneNetwork
+#
 
 
 

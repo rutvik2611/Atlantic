@@ -44,7 +44,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # SSH command to set MAIN_DOMAIN environment variable and bring up prod-docker-compose.yml on remote server
-ssh "${DROPLET_USER}@${DROPLET_IP}" "export MAIN_DOMAIN= && export url= && export pass= && docker-compose -f ${REMOTE_DIR}/${DOCKER_COMPOSE_FILE} up -d"
+ssh "${DROPLET_USER}@${DROPLET_IP}" "export MAIN_DOMAIN=rutvik2611.com && export url= && export pass= && docker-compose -f ${REMOTE_DIR}/${DOCKER_COMPOSE_FILE} up -d"
 
 # Check if docker-compose up command succeeded
 if [ $? -ne 0 ]; then

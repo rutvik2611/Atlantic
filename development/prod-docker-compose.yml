@@ -16,14 +16,14 @@ services:
       - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
       - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
       # uat
-#      - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-#      # Prod
+      # - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      # Prod
       - "--certificatesresolvers.myresolver.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
       - "--certificatesresolvers.myresolver.acme.email=rutvik2611@gmail.com"
       # Enable HTTP to HTTPS redirection middleware
-#      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
-#      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
-#      - "--entrypoints.web.http.redirections.entryPoint.permanent=true"
+      # - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      # - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      # - "--entrypoints.web.http.redirections.entryPoint.permanent=true"
     ports:
       - "80:80"
       - "443:443"
@@ -86,7 +86,7 @@ services:
     volumes:
       - "./persist/radarr/config:/radarr/config"
       - "./persist/radarr/movies:/radarr/movies"
-      - "./persist/raddar/downloads:/radarr/downloads"
+      - "./persist/radarr/downloads:/radarr/downloads"
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -168,7 +168,7 @@ services:
       - "traefik.http.routers.vscode-secure.rule=Host(`vscode.${MAIN_DOMAIN}`)"
       - "traefik.http.routers.vscode-secure.entrypoints=websecure"
       - "traefik.http.routers.vscode-secure.tls.certresolver=myresolver"
-      - "traefik.http.services.vscode-secure.loadbalancer.server.port=8080"
+      - "traefik.http.services.vscode.loadbalancer.server.port=8080"
     networks:
       backboneNetwork:
         ipv4_address: 172.20.0.8
@@ -178,4 +178,4 @@ networks:
     external: true
     ipam:
       config:
-        - subnet: 172.20.0.0/16
+        - subnet: "172.20.0.0/16"

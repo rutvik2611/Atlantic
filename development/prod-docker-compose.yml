@@ -32,7 +32,8 @@ services:
       - "./persist/letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
-      - backboneNetwork
+      backboneNetwork:
+        ipv4_address: 172.20.0.2
 
   portainer:
     image: "portainer/portainer:latest"
@@ -43,35 +44,15 @@ services:
       - "./persist/portainer/data:/data"  # Mount volume for Portainer data persistence
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.portainer.rule=Host(`portainer.${MAIN_DOMAIN}`)"
-      - "traefik.http.routers.portainer.entrypoints=websecure"  # Define the entry point
-      - "traefik.http.routers.portainer.tls.certresolver=myresolver"  # Define the TLS resolver
-      - "traefik.http.services.portainer.loadbalancer.server.port=9000"  # Define the Portainer service port
+      - "traefik.http.routers.portainer-http.rule=Host(`portainer.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.portainer-http.entrypoints=web"
+      - "traefik.http.routers.portainer-secure.rule=Host(`portainer.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.portainer-secure.entrypoints=websecure"
+      - "traefik.http.routers.portainer-secure.tls.certresolver=myresolver"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
     networks:
-      - backboneNetwork
-
-#  clip-sync:
-#    image: temp12611/clipsync:latest
-#    container_name: "clip-sync"
-##    ports:
-##      - "5001:5001"
-##    env_file:
-##      - ../.env
-#    restart: always
-#    environment:
-#      AWS_REGION: ${AWS_REGION:-}
-#      AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID:-}
-#      url: ${url}
-#      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-#      pass: ${pass}
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.http.routers.clipsync.rule=Host(`magicsync.${MAIN_DOMAIN}`)"
-#      - "traefik.http.routers.clipsync.entrypoints=websecure"
-#      - "traefik.http.routers.clipsync.tls.certresolver=myresolver"
-#      - "traefik.http.services.clipsync.loadbalancer.server.port=5001"
-#    networks:
-#      - backboneNetwork
+      backboneNetwork:
+        ipv4_address: 172.20.0.3
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
@@ -82,18 +63,18 @@ services:
       - TZ=America/New_York
     volumes:
       - ./persist/prowlarr:/config
-#    ports:
-#      - "9696:9696"
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.${MAIN_DOMAIN}`)"
-      - "traefik.http.routers.prowlarr.entrypoints=websecure"
-      - "traefik.http.routers.prowlarr.tls.certresolver=myresolver"
+      - "traefik.http.routers.prowlarr-http.rule=Host(`prowlarr.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.prowlarr-http.entrypoints=web"
+      - "traefik.http.routers.prowlarr-secure.rule=Host(`prowlarr.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.prowlarr-secure.entrypoints=websecure"
+      - "traefik.http.routers.prowlarr-secure.tls.certresolver=myresolver"
       - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
     networks:
-      - backboneNetwork
-
+      backboneNetwork:
+        ipv4_address: 172.20.0.4
 
   radarr:
     image: lscr.io/linuxserver/radarr:latest
@@ -109,12 +90,15 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.radarr.rule=Host(`radarr.${MAIN_DOMAIN}`)"
-      - "traefik.http.routers.radarr.entrypoints=websecure"
-      - "traefik.http.routers.radarr.tls.certresolver=myresolver"
+      - "traefik.http.routers.radarr-http.rule=Host(`radarr.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.radarr-http.entrypoints=web"
+      - "traefik.http.routers.radarr-secure.rule=Host(`radarr.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.radarr-secure.entrypoints=websecure"
+      - "traefik.http.routers.radarr-secure.tls.certresolver=myresolver"
       - "traefik.http.services.radarr.loadbalancer.server.port=7878"
     networks:
-      - backboneNetwork
+      backboneNetwork:
+        ipv4_address: 172.20.0.5
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
@@ -130,12 +114,16 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.${MAIN_DOMAIN}`)"
-      - "traefik.http.routers.qbittorrent.entrypoints=websecure"
-      - "traefik.http.routers.qbittorrent.tls.certresolver=myresolver"
+      - "traefik.http.routers.qbittorrent-http.rule=Host(`qbittorrent.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.qbittorrent-http.entrypoints=web"
+      - "traefik.http.routers.qbittorrent-secure.rule=Host(`qbittorrent.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.qbittorrent-secure.entrypoints=websecure"
+      - "traefik.http.routers.qbittorrent-secure.tls.certresolver=myresolver"
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
     networks:
-      - backboneNetwork
+      backboneNetwork:
+        ipv4_address: 172.20.0.6
+
   jellyfin:
     image: jellyfin/jellyfin
     container_name: jellyfin
@@ -150,18 +138,44 @@ services:
       - "./persist/qbittorrent/downloads:/media"
     labels:
       - "traefik.enable=true"
+      # HTTP router
+      - "traefik.http.routers.jellyfin-http.rule=Host(`jellyfin.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.jellyfin-http.entrypoints=web"
       # HTTPS router
       - "traefik.http.routers.jellyfin-secure.rule=Host(`jellyfin.${MAIN_DOMAIN}`)"
       - "traefik.http.routers.jellyfin-secure.entrypoints=websecure"
       - "traefik.http.routers.jellyfin-secure.tls.certresolver=myresolver"
       - "traefik.http.services.jellyfin-secure.loadbalancer.server.port=8096"
     networks:
-      - backboneNetwork
+      backboneNetwork:
+        ipv4_address: 172.20.0.7
 
-
-
-
+  vscode:
+    image: codercom/code-server
+    container_name: vscode-server
+    restart: always
+    environment:
+      - PASSWORD=password  # Replace with your desired password
+    volumes:
+      - "./persist/code:/home/coder/project"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      - "traefik.enable=true"
+      # HTTP router
+      - "traefik.http.routers.vscode-http.rule=Host(`vscode.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.vscode-http.entrypoints=web"
+      # HTTPS router
+      - "traefik.http.routers.vscode-secure.rule=Host(`vscode.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.vscode-secure.entrypoints=websecure"
+      - "traefik.http.routers.vscode-secure.tls.certresolver=myresolver"
+      - "traefik.http.services.vscode-secure.loadbalancer.server.port=8080"
+    networks:
+      backboneNetwork:
+        ipv4_address: 172.20.0.8
 
 networks:
   backboneNetwork:
     external: true
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

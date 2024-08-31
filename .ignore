@@ -1,0 +1,38 @@
+# Ignore macOS-specific files
+.DS_Store
+
+# Ignore temporary files and directories
+*.swp
+*.swo
+*.bak
+*.tmp
+*.log
+*.cache
+
+# Ignore Python cache and virtual environment directories
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.env
+
+# Ignore node modules and dependencies
+node_modules/
+
+# Ignore build and distribution directories
+build/
+dist/
+
+# Ignore version control directories
+.git/
+.hg/
+.svn/
+.idea/
+
+# Ignore Docker-related files and directories
+*.tar
+docker-compose.override.yml
+docker-compose.local.yml
+
+# Ignore persist directory in the development folder
+emulating_server/

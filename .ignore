@@ -14,7 +14,7 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 .venv/
-.env
+.env/
 
 # Ignore node modules and dependencies
 node_modules/
@@ -36,3 +36,5 @@ docker-compose.local.yml
 
 # Ignore persist directory in the development folder
 emulating_server/
+local.env
+remote.env

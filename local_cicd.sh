@@ -1,8 +1,12 @@
 #!/bin/bash
 
-# Load environment variables from .env file, if it exists
-if [ -f .env ]; then
-    export $(cat .env | xargs)
+# Load environment variables from local.env file, if it exists
+if [ -f local.env ]; then
+    export $(cat local.env | xargs)
+    echo "Environment variables loaded from local.env."
+else
+    echo "Error: local.env file not found."
+    exit 1
 fi
 
 # Create local emulation directory if it does not exist
@@ -36,3 +40,5 @@ for yml_file in *.yml; do
         docker-compose -f "$yml_file" up -d
     fi
 done
+
+echo "Docker containers deployed successfully."

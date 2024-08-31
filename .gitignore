@@ -1,3 +1,5 @@
+/local.env
+/remote.env
 # Ignore macOS-specific files
 .DS_Store
 

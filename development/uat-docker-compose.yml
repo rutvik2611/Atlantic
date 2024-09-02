@@ -6,20 +6,22 @@ services:
     container_name: ollama
     volumes:
       - ./persist/ollama:/root/.ollama
+      - ./persist/all/ollama:/root/
     tty: true
     restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.ollama.rule=Host(`ollama.${MAIN_DOMAIN}`)"
-      - "traefik.http.routers.ollama.entrypoints=web"
-      - "traefik.http.routers.ollama-secure.rule=Host(`ollama.${MAIN_DOMAIN}`)"
-      - "traefik.http.routers.ollama-secure.entrypoints=websecure"
-      - "traefik.http.routers.ollama-secure.tls.certresolver=myresolver"
-      - "traefik.http.services.ollama.loadbalancer.server.port=11434"
     networks:
       - backboneNetwork
-#    ports:
-#      - "11434:11434"  # DEBUG
+    # Uncomment these lines if you need Traefik configuration
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.ollama.rule=Host(`ollama.${MAIN_DOMAIN}`)"
+    #   - "traefik.http.routers.ollama.entrypoints=web"
+    #   - "traefik.http.routers.ollama-secure.rule=Host(`ollama.${MAIN_DOMAIN}`)"
+    #   - "traefik.http.routers.ollama-secure.entrypoints=websecure"
+    #   - "traefik.http.routers.ollama-secure.tls.certresolver=myresolver"
+    #   - "traefik.http.services.ollama.loadbalancer.server.port=11434"
+    # ports:
+    #   - "11434:11434"  # DEBUG
 
   open-webui:
     image: ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG:-main}
@@ -31,6 +33,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./persist/open-webui:/app/backend/data
+      - ./persist/all/open-webui:/root/  # Mount the 'all' folder for visibility
     environment:
       - OLLAMA_BASE_URL=http://ollama:11434 # Need to manually update this
       - WEBUI_SECRET_KEY=

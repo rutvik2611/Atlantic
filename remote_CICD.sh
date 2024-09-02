@@ -80,3 +80,6 @@ ssh $SSH_USER@$SSH_HOST <<EOF
 EOF
 
 echo "Docker containers deployed successfully on remote machine."
+
+# kill all containers - docker rm $(docker ps -a -q)
+

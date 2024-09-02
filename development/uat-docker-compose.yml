@@ -20,8 +20,8 @@ services:
     #   - "traefik.http.routers.ollama-secure.entrypoints=websecure"
     #   - "traefik.http.routers.ollama-secure.tls.certresolver=myresolver"
     #   - "traefik.http.services.ollama.loadbalancer.server.port=11434"
-    # ports:
-    #   - "11434:11434"  # DEBUG
+    ports:
+      - "11434:11434"  # DEBUG
 
   open-webui:
     image: ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG:-main}

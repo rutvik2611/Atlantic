@@ -19,7 +19,7 @@ services:
     networks:
       - backboneNetwork
 #    ports:
-#      - "11434:11434"  # Example port for debugging (adjust as needed)
+#      - "11434:11434"  # DEBUG
 
   open-webui:
     image: ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG:-main}
@@ -32,7 +32,7 @@ services:
     volumes:
       - ./persist/open-webui:/app/backend/data
     environment:
-      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_BASE_URL=http://ollama:11434 # Need to manually update this
       - WEBUI_SECRET_KEY=
     extra_hosts:
       - host.docker.internal:host-gateway

@@ -137,10 +137,10 @@ services:
     labels:
       - "traefik.enable=true"
       # HTTP router
-      - "traefik.http.routers.jellyfin-http.rule=Host(`jellyfin.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.jellyfin-http.rule=Host(`j.${MAIN_DOMAIN}`)"
       - "traefik.http.routers.jellyfin-http.entrypoints=web"
       # HTTPS router
-      - "traefik.http.routers.jellyfin-secure.rule=Host(`jellyfin.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.jellyfin-secure.rule=Host(`j.${MAIN_DOMAIN}`)"
       - "traefik.http.routers.jellyfin-secure.entrypoints=websecure"
       - "traefik.http.routers.jellyfin-secure.tls.certresolver=myresolver"
       - "traefik.http.services.jellyfin-secure.loadbalancer.server.port=8096"

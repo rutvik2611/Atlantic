@@ -8,10 +8,18 @@ services:
       - ./persist/ollama:/root/.ollama
     tty: true
     restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ollama.rule=Host(`ollama.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.ollama.entrypoints=web"
+      - "traefik.http.routers.ollama-secure.rule=Host(`ollama.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.ollama-secure.entrypoints=websecure"
+      - "traefik.http.routers.ollama-secure.tls.certresolver=myresolver"
+      - "traefik.http.services.ollama.loadbalancer.server.port=11434"
     networks:
       - backboneNetwork
-    ports:
-      - "11434:11434"  # Example port for debugging (adjust as needed)
+#    ports:
+#      - "11434:11434"  # Example port for debugging (adjust as needed)
 
   open-webui:
     image: ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG:-main}

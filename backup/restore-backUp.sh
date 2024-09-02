@@ -3,7 +3,7 @@
 # SSH connection details
 SSH_USER="root"
 SSH_HOST="rutvik2611.com"
-REMOTE_PERSIST_DIR="/app/test/persist"
+REMOTE_PERSIST_DIR="/app/development-pending-xxxx/persist"
 LOCAL_BACKUP_DIR="$(pwd)/prod-backup/persist"
 
 # Function to handle the restoration process

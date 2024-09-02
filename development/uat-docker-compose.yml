@@ -1,0 +1,50 @@
+version: "3.3"
+
+services:
+  ollama:
+    image: ollama/ollama:${OLLAMA_DOCKER_TAG:-latest}
+    container_name: ollama
+    volumes:
+      - ./persist/ollama:/root/.ollama
+    tty: true
+    restart: unless-stopped
+    networks:
+      - backboneNetwork
+    ports:
+      - "11434:11434"  # Example port for debugging (adjust as needed)
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG:-main}
+    container_name: open-webui
+    build:
+      context: .
+      args:
+        OLLAMA_BASE_URL: '/ollama'
+      dockerfile: Dockerfile
+    volumes:
+      - ./persist/open-webui:/app/backend/data
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_SECRET_KEY=
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    depends_on:
+      - ollama
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.open-webui-http.rule=Host(`xchat.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.open-webui-http.entrypoints=web"
+      - "traefik.http.routers.open-webui-secure.rule=Host(`xchat.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.open-webui-secure.entrypoints=websecure"
+      - "traefik.http.routers.open-webui-secure.tls.certresolver=myresolver"
+      - "traefik.http.services.open-webui.loadbalancer.server.port=8080"
+    networks:
+      - backboneNetwork
+
+networks:
+  backboneNetwork:
+    external: true
+    ipam:
+      config:
+        - subnet: "172.20.0.0/16"

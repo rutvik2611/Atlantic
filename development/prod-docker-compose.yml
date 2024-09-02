@@ -15,11 +15,9 @@ services:
       - "--entryPoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
       - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
-      # uat
-      # - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-      # Prod
-      - "--certificatesresolvers.myresolver.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
-      - "--certificatesresolvers.myresolver.acme.email=rutvik2611@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.caserver=${ACME_SERVER}" # Using env variable for ACME server
+      - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}"     # Using env variable for email
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json" # Explicitly specify the storage file
       # Enable HTTP to HTTPS redirection middleware
       # - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       # - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
@@ -172,6 +170,23 @@ services:
     networks:
       backboneNetwork:
         ipv4_address: 172.20.0.8
+
+
+  whoami:
+    image: "traefik/whoami"
+    container_name: "whoami"
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami-http.rule=Host(`whoami.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.whoami-http.entrypoints=web"
+      - "traefik.http.routers.whoami-secure.rule=Host(`whoami.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.whoami-secure.entrypoints=websecure"
+      - "traefik.http.routers.whoami-secure.tls.certresolver=myresolver"
+      - "traefik.http.services.whoami.loadbalancer.server.port=80"
+    networks:
+      backboneNetwork:
+        ipv4_address: 172.20.0.10
 
 networks:
   backboneNetwork:

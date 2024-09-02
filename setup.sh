@@ -8,13 +8,13 @@ LOCAL_DIR="./development"
 ENV_FILE="remote.env"  # Change this if you want to use a different env file
 EXCLUDE_DIR="persist"  # Directory to exclude during rsync
 
-# Install Docker and Docker Compose on remote server
+# Install Docker, Docker Compose, and zip on the remote server
 ssh $SSH_USER@$SSH_HOST << 'EOF'
 # Update the package index
 apt-get update
 
 # Install dependencies
-apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+apt-get install -y apt-transport-https ca-certificates curl software-properties-common zip
 
 # Add Docker's official GPG key
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
@@ -37,6 +37,7 @@ chmod +x /usr/local/bin/docker-compose
 # Verify installation
 docker --version
 docker-compose --version
+zip --version
 
 # Create Docker network
 docker network create backboneNetwork

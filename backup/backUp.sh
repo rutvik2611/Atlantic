@@ -5,7 +5,7 @@ SSH_USER="root"
 SSH_HOST="rutvik2611.com"
 REMOTE_PERSIST_DIR="/app/development/persist"
 LOCAL_BACKUP_DIR="$(pwd)/prod-backup/persist"
-SIZE_THRESHOLD_MB=100  # Size threshold in MB
+SIZE_THRESHOLD_MB=70  # Size threshold in MB
 
 # Ensure the backup directory exists locally
 mkdir -p "$LOCAL_BACKUP_DIR"

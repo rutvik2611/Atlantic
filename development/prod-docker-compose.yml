@@ -195,5 +195,5 @@ networks:
       config:
         - subnet: "172.20.0.0/16"
 
-          Cannot connect to host host.docker.internal:11434 ssl:default [Connect call failed ('172.17.0.1', 11434)]
+
 

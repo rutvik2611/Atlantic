@@ -133,7 +133,9 @@ services:
     volumes:
       - "./persist/jellyfin/config:/config"
       - "./persist/jellyfin/cache:/cache"
-      - "./persist/qbittorrent/downloads:/media"
+      - "./persist/qbittorrent/downloads:/media/qbit/"
+      - "./persist/deluge/downloads:/media/deluge/"
+
     labels:
       - "traefik.enable=true"
       # HTTP router

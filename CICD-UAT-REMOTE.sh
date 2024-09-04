@@ -60,16 +60,6 @@ ssh $SSH_USER@$SSH_HOST <<EOF
         fi
     done
 
-    # Remove orphan containers that are not defined in the Docker Compose files
-    echo "Removing orphan containers..."
-    docker container prune -f
-    echo "Orphan containers removed."
-
-    # Remove all stopped containers to ensure no orphan containers remain
-    echo "Removing all stopped containers..."
-    docker rm -f \$(docker ps -aq) 2>/dev/null
-    echo "Stopped containers removed."
-
     # Start services defined in the Docker Compose files, skipping those with 'prod' in the name
     for yml_file in *.yml; do
         if [[ -f "\$yml_file" && "\$yml_file" != *prod*.yml ]]; then

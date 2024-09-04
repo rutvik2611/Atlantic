@@ -12,14 +12,14 @@ services:
     networks:
       - backboneNetwork
     # Uncomment these lines if you need Traefik configuration
-    # labels:
-    #   - "traefik.enable=true"
-    #   - "traefik.http.routers.ollama.rule=Host(`ollama.${MAIN_DOMAIN}`)"
-    #   - "traefik.http.routers.ollama.entrypoints=web"
-    #   - "traefik.http.routers.ollama-secure.rule=Host(`ollama.${MAIN_DOMAIN}`)"
-    #   - "traefik.http.routers.ollama-secure.entrypoints=websecure"
-    #   - "traefik.http.routers.ollama-secure.tls.certresolver=myresolver"
-    #   - "traefik.http.services.ollama.loadbalancer.server.port=11434"
+    labels:
+     - "traefik.enable=true"
+     - "traefik.http.routers.ollama.rule=Host(`ollama.${MAIN_DOMAIN}`)"
+     - "traefik.http.routers.ollama.entrypoints=web"
+     - "traefik.http.routers.ollama-secure.rule=Host(`ollama.${MAIN_DOMAIN}`)"
+     - "traefik.http.routers.ollama-secure.entrypoints=websecure"
+     - "traefik.http.routers.ollama-secure.tls.certresolver=myresolver"
+     - "traefik.http.services.ollama.loadbalancer.server.port=11434"
     ports:
       - "11434:11434"  # DEBUG
 
@@ -52,6 +52,34 @@ services:
       - "traefik.http.services.open-webui.loadbalancer.server.port=8080"
     networks:
       - backboneNetwork
+
+  deluge:
+    image: linuxserver/deluge:latest
+    container_name: deluge
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - DELUGE_UID=1000
+      - DELUGE_GID=1000
+      - DELUGE_WEB_PORT=8112
+      - DELUGE_PORT=58846
+      - DELUGE_DAEMON_PORT=58846
+    volumes:
+      - "./persist/deluge/config:/config"
+      - "./persist/deluge/downloads:/downloads"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.deluge-http.rule=Host(`deluge.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.deluge-http.entrypoints=web"
+      - "traefik.http.routers.deluge-secure.rule=Host(`deluge.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.deluge-secure.entrypoints=websecure"
+      - "traefik.http.routers.deluge-secure.tls.certresolver=myresolver"
+      - "traefik.http.services.deluge.loadbalancer.server.port=8112"
+    networks:
+      backboneNetwork:
+        ipv4_address: 172.20.0.19
+
 
 networks:
   backboneNetwork:

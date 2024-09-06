@@ -78,7 +78,7 @@ services:
       - "traefik.http.services.deluge.loadbalancer.server.port=8112"
     networks:
       backboneNetwork:
-        ipv4_address: 172.20.0.19
+#        ipv4_address: 172.20.0.19
 
 
 networks:

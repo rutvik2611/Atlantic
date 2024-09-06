@@ -31,7 +31,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
       backboneNetwork:
-        ipv4_address: 172.20.0.2
+#        ipv4_address: 172.20.0.2
 
   portainer:
     image: "portainer/portainer:latest"
@@ -50,7 +50,7 @@ services:
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
     networks:
       backboneNetwork:
-        ipv4_address: 172.20.0.3
+#        ipv4_address: 172.20.0.3
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
@@ -72,7 +72,7 @@ services:
       - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
     networks:
       backboneNetwork:
-        ipv4_address: 172.20.0.4
+#        ipv4_address: 172.20.0.4
 
   radarr:
     image: lscr.io/linuxserver/radarr:latest
@@ -96,7 +96,7 @@ services:
       - "traefik.http.services.radarr.loadbalancer.server.port=7878"
     networks:
       backboneNetwork:
-        ipv4_address: 172.20.0.5
+#        ipv4_address: 172.20.0.5
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
@@ -120,7 +120,7 @@ services:
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
     networks:
       backboneNetwork:
-        ipv4_address: 172.20.0.6
+#        ipv4_address: 172.20.0.6
 
   jellyfin:
     image: jellyfin/jellyfin
@@ -148,7 +148,7 @@ services:
       - "traefik.http.services.jellyfin-secure.loadbalancer.server.port=8096"
     networks:
       backboneNetwork:
-        ipv4_address: 172.20.0.7
+#        ipv4_address: 172.20.0.7
 
   vscode:
     image: codercom/code-server
@@ -171,7 +171,7 @@ services:
       - "traefik.http.services.vscode.loadbalancer.server.port=8080"
     networks:
       backboneNetwork:
-        ipv4_address: 172.20.0.8
+#        ipv4_address: 172.20.0.8
 
 
   whoami:
@@ -188,7 +188,7 @@ services:
       - "traefik.http.services.whoami.loadbalancer.server.port=80"
     networks:
       backboneNetwork:
-        ipv4_address: 172.20.0.10
+#        ipv4_address: 172.20.0.10
 
 networks:
   backboneNetwork:

@@ -3,8 +3,14 @@
 # SSH connection details
 SSH_USER="root"
 SSH_HOST="rutvik2611.com"
-REMOTE_PERSIST_DIR="/app/development-pending-xxxx/persist"
+REMOTE_PERSIST_DIR="/app/development/persist"
 LOCAL_BACKUP_DIR="$(pwd)/prod-backup/persist"
+
+
+# Ensure the remote persist directory exists
+echo "Ensuring remote directory exists: $REMOTE_PERSIST_DIR"
+ssh $SSH_USER@$SSH_HOST "sudo mkdir -p $REMOTE_PERSIST_DIR && sudo chmod 755 $REMOTE_PERSIST_DIR"
+
 
 # Function to handle the restoration process
 restore_folder() {

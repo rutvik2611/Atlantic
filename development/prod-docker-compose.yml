@@ -64,9 +64,9 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.prowlarr-http.rule=Host(`prowlarr.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.prowlarr-http.rule=Host(`p.${MAIN_DOMAIN}`)"
       - "traefik.http.routers.prowlarr-http.entrypoints=web"
-      - "traefik.http.routers.prowlarr-secure.rule=Host(`prowlarr.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.prowlarr-secure.rule=Host(`p.${MAIN_DOMAIN}`)"
       - "traefik.http.routers.prowlarr-secure.entrypoints=websecure"
       - "traefik.http.routers.prowlarr-secure.tls.certresolver=myresolver"
       - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"

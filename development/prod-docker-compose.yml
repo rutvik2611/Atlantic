@@ -112,9 +112,9 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.qbittorrent-http.rule=Host(`qbittorrent.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.qbittorrent-http.rule=Host(`q.${MAIN_DOMAIN}`)"
       - "traefik.http.routers.qbittorrent-http.entrypoints=web"
-      - "traefik.http.routers.qbittorrent-secure.rule=Host(`qbittorrent.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.qbittorrent-secure.rule=Host(`q.${MAIN_DOMAIN}`)"
       - "traefik.http.routers.qbittorrent-secure.entrypoints=websecure"
       - "traefik.http.routers.qbittorrent-secure.tls.certresolver=myresolver"
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"

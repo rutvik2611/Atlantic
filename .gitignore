@@ -40,3 +40,4 @@ docker-compose.local.yml
 emulating_server/
 local.env
 remote.env
+localRUN

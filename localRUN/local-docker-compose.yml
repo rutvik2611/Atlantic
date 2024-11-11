@@ -1,0 +1,49 @@
+
+
+version: "3.3"
+
+services:
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./persist/prowlarr:/config
+    restart: unless-stopped
+    ports:
+      - "1001:9696"  # Expose Prowlarr directly on port 1001
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - WEBUI_PORT=8080
+    volumes:
+      - "./persist/qbittorrent/config:/config"
+      - "./persist/qbittorrent/downloads:/downloads"
+    restart: unless-stopped
+    ports:
+      - "1002:8080"  # Expose qBittorrent directly on port 1002
+
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    restart: always
+    environment:
+      - PUID=1000  # Replace with your user ID
+      - PGID=1000  # Replace with your group ID
+      - TZ=Etc/UTC  # Replace with your timezone
+    volumes:
+      - "./persist/jellyfin/config:/config"
+      - "./persist/jellyfin/cache:/cache"
+      - "./persist/qbittorrent/downloads:/media/qbit/"
+      - "./persist/deluge/downloads:/media/deluge/"
+    ports:
+      - "1003:8096"  # Expose Jellyfin directly on port 1003

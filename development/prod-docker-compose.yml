@@ -33,24 +33,24 @@ services:
       backboneNetwork:
 #        ipv4_address: 172.20.0.2
 
-  portainer:
-    image: "portainer/portainer:latest"
-    container_name: "portainer"
-    restart: always
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./persist/portainer/data:/data"  # Mount volume for Portainer data persistence
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.portainer-http.rule=Host(`portainer.${MAIN_DOMAIN}`)"
-      - "traefik.http.routers.portainer-http.entrypoints=web"
-      - "traefik.http.routers.portainer-secure.rule=Host(`portainer.${MAIN_DOMAIN}`)"
-      - "traefik.http.routers.portainer-secure.entrypoints=websecure"
-      - "traefik.http.routers.portainer-secure.tls.certresolver=myresolver"
-      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
-    networks:
-      backboneNetwork:
-#        ipv4_address: 172.20.0.3
+#  portainer:
+#    image: "portainer/portainer:latest"
+#    container_name: "portainer"
+#    restart: always
+#    volumes:
+#      - "/var/run/docker.sock:/var/run/docker.sock"
+#      - "./persist/portainer/data:/data"  # Mount volume for Portainer data persistence
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.portainer-http.rule=Host(`portainer.${MAIN_DOMAIN}`)"
+#      - "traefik.http.routers.portainer-http.entrypoints=web"
+#      - "traefik.http.routers.portainer-secure.rule=Host(`portainer.${MAIN_DOMAIN}`)"
+#      - "traefik.http.routers.portainer-secure.entrypoints=websecure"
+#      - "traefik.http.routers.portainer-secure.tls.certresolver=myresolver"
+#      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+#    networks:
+#      backboneNetwork:
+##        ipv4_address: 172.20.0.3
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
@@ -74,29 +74,29 @@ services:
       backboneNetwork:
 #        ipv4_address: 172.20.0.4
 
-  radarr:
-    image: lscr.io/linuxserver/radarr:latest
-    container_name: radarr
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/New_York
-    volumes:
-      - "./persist/radarr/config:/radarr/config"
-      - "./persist/radarr/movies:/radarr/movies"
-      - "./persist/radarr/downloads:/radarr/downloads"
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.radarr-http.rule=Host(`radarr.${MAIN_DOMAIN}`)"
-      - "traefik.http.routers.radarr-http.entrypoints=web"
-      - "traefik.http.routers.radarr-secure.rule=Host(`radarr.${MAIN_DOMAIN}`)"
-      - "traefik.http.routers.radarr-secure.entrypoints=websecure"
-      - "traefik.http.routers.radarr-secure.tls.certresolver=myresolver"
-      - "traefik.http.services.radarr.loadbalancer.server.port=7878"
-    networks:
-      backboneNetwork:
-#        ipv4_address: 172.20.0.5
+#  radarr:
+#    image: lscr.io/linuxserver/radarr:latest
+#    container_name: radarr
+#    environment:
+#      - PUID=1000
+#      - PGID=1000
+#      - TZ=America/New_York
+#    volumes:
+#      - "./persist/radarr/config:/radarr/config"
+#      - "./persist/radarr/movies:/radarr/movies"
+#      - "./persist/radarr/downloads:/radarr/downloads"
+#    restart: unless-stopped
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.radarr-http.rule=Host(`radarr.${MAIN_DOMAIN}`)"
+#      - "traefik.http.routers.radarr-http.entrypoints=web"
+#      - "traefik.http.routers.radarr-secure.rule=Host(`radarr.${MAIN_DOMAIN}`)"
+#      - "traefik.http.routers.radarr-secure.entrypoints=websecure"
+#      - "traefik.http.routers.radarr-secure.tls.certresolver=myresolver"
+#      - "traefik.http.services.radarr.loadbalancer.server.port=7878"
+#    networks:
+#      backboneNetwork:
+##        ipv4_address: 172.20.0.5
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
@@ -150,45 +150,45 @@ services:
       backboneNetwork:
 #        ipv4_address: 172.20.0.7
 
-  vscode:
-    image: codercom/code-server
-    container_name: vscode-server
-    restart: always
-    environment:
-      - PASSWORD=password  # Replace with your desired password
-    volumes:
-      - "./persist/code:/home/coder/project"
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    labels:
-      - "traefik.enable=true"
-      # HTTP router
-      - "traefik.http.routers.vscode-http.rule=Host(`vscode.${MAIN_DOMAIN}`)"
-      - "traefik.http.routers.vscode-http.entrypoints=web"
-      # HTTPS router
-      - "traefik.http.routers.vscode-secure.rule=Host(`vscode.${MAIN_DOMAIN}`)"
-      - "traefik.http.routers.vscode-secure.entrypoints=websecure"
-      - "traefik.http.routers.vscode-secure.tls.certresolver=myresolver"
-      - "traefik.http.services.vscode.loadbalancer.server.port=8080"
-    networks:
-      backboneNetwork:
-#        ipv4_address: 172.20.0.8
-
-
-  whoami:
-    image: "traefik/whoami"
-    container_name: "whoami"
-    restart: always
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.whoami-http.rule=Host(`whoami.${MAIN_DOMAIN}`)"
-      - "traefik.http.routers.whoami-http.entrypoints=web"
-      - "traefik.http.routers.whoami-secure.rule=Host(`whoami.${MAIN_DOMAIN}`)"
-      - "traefik.http.routers.whoami-secure.entrypoints=websecure"
-      - "traefik.http.routers.whoami-secure.tls.certresolver=myresolver"
-      - "traefik.http.services.whoami.loadbalancer.server.port=80"
-    networks:
-      backboneNetwork:
-#        ipv4_address: 172.20.0.10
+#  vscode:
+#    image: codercom/code-server
+#    container_name: vscode-server
+#    restart: always
+#    environment:
+#      - PASSWORD=password  # Replace with your desired password
+#    volumes:
+#      - "./persist/code:/home/coder/project"
+#      - "/var/run/docker.sock:/var/run/docker.sock"
+#    labels:
+#      - "traefik.enable=true"
+#      # HTTP router
+#      - "traefik.http.routers.vscode-http.rule=Host(`vscode.${MAIN_DOMAIN}`)"
+#      - "traefik.http.routers.vscode-http.entrypoints=web"
+#      # HTTPS router
+#      - "traefik.http.routers.vscode-secure.rule=Host(`vscode.${MAIN_DOMAIN}`)"
+#      - "traefik.http.routers.vscode-secure.entrypoints=websecure"
+#      - "traefik.http.routers.vscode-secure.tls.certresolver=myresolver"
+#      - "traefik.http.services.vscode.loadbalancer.server.port=8080"
+#    networks:
+#      backboneNetwork:
+##        ipv4_address: 172.20.0.8
+#
+#
+#  whoami:
+#    image: "traefik/whoami"
+#    container_name: "whoami"
+#    restart: always
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.whoami-http.rule=Host(`whoami.${MAIN_DOMAIN}`)"
+#      - "traefik.http.routers.whoami-http.entrypoints=web"
+#      - "traefik.http.routers.whoami-secure.rule=Host(`whoami.${MAIN_DOMAIN}`)"
+#      - "traefik.http.routers.whoami-secure.entrypoints=websecure"
+#      - "traefik.http.routers.whoami-secure.tls.certresolver=myresolver"
+#      - "traefik.http.services.whoami.loadbalancer.server.port=80"
+#    networks:
+#      backboneNetwork:
+##        ipv4_address: 172.20.0.10
 
 networks:
   backboneNetwork:
